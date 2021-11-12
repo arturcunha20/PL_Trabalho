@@ -94,6 +94,5 @@ colunas = processor.cabecalho()
 processor.escrever(colunas,linhas)
 processor.toc()
 
-
-
+olaaaaaaaaaaaaaaaaaaaaa
 #print("categorais -> " ,colunas,linhas)
