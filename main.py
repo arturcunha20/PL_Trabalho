@@ -1,6 +1,11 @@
 import ply.lex as plex
 import csv
 
+linhasCount = 0
+colunasCount = 0
+posicaoLinha = 0
+posicaoColuna = 0
+
 class virgulas:
     tokens = ("COMMENT","QUOTATION","COMMA")
     t_ignore = ""
@@ -11,15 +16,20 @@ class virgulas:
 
     def t_QUOTATION(self,t):
         r"(,?)\"[^\"]+(\"?),?"
+        escreverTabela(t.value)
         return t
 
     def t_COMMA(self,t):
         r"(,?)[^\,]+,?"
+        escreverTabela(t.value)
         return t
 
     def t_error(self, t):
         print(f"Unexpected tokens: {t.value[:10]}")
         exit(1)
+
+
+
 
     def __init__(self, filename):
         self.lexer = None
@@ -34,7 +44,8 @@ class virgulas:
             if i == 0:
                 numero = len(line)
             i  = i +1
-        return numero
+        global colunasCount
+        colunasCount = numero
 
     def verLinhas(self):
         i = 0
@@ -44,7 +55,8 @@ class virgulas:
             i = i +1
             if line[0][0] == "#":
                 i = i-1
-        return i
+        global linhasCount
+        linhasCount = i
 
 
     def toc(self, **kwargs):
@@ -55,16 +67,34 @@ class virgulas:
         for x in contents.splitlines():
             self.lexer.input(x)
             for token in iter(self.lexer.token, None):
-                #pass
-                print(token)
+                pass
+                #print(token)
         print("Finished processing")
+
+    def escreverincio(self):
+        text = '''<html>
+    <body>
+        <table id = "customers">'''
+        file = open("tabela.html", "a")
+        file.write(text)
+        file.close()
+
+    def escreverfim(self):
+        text = '''
+        </table>
+    </body>
+</html>    
+                '''
+        file = open("tabela.html", "a")
+        file.write(text)
+        file.close()
 
     def escrever(self,colunas,linhas):
         text = '''<html>
     <body>
-        <table border = "1" padding = 10>
+        <table id = "customers">
 
-        '''
+            '''
         file = open("tabela.html", "w")
         file.write(text)
         file.close()
@@ -79,20 +109,74 @@ class virgulas:
                 text = "<td>  Eu sou lindo  </td>"
                 file.write(text)
 
-
-        text = '''</table>
+        text = '''
+        </table>
     </body>
 </html>    
-        '''
+                '''
         file.write(text)
         file.close()
 
+def styleCSS():
+    text = '''
+    <style>
+#customers {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#customers tr:nth-child(even){background-color: #f2f2f2;}
+
+#customers tr:hover {background-color: #ddd;}
+
+#customers th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #04AA6D;
+  color: white;
+}
+</style>'''
+
+    file = open("tabela.html", "w")
+    file.write(text)
+    file.close()
+
+
+def escreverTabela(palavra):
+    file = open("tabela.html", "a")
+    global posicaoLinha,linhasCount,posicaoColuna,colunasCount
+    print(posicaoColuna)
+    if(posicaoLinha < linhasCount):
+        text = '''<td>''' + palavra + '''</td>'''
+        file.write(text)
+
+        if (posicaoLinha == linhasCount - 1):
+            posicaoLinha = 0
+        posicaoLinha = posicaoLinha + 1
+
+    if(posicaoColuna == colunasCount - 1):
+        text = '''</tr>'''
+        file.write(text)
+        posicaoColuna = -1
+
+    posicaoColuna = posicaoColuna + 1
+
+    file.close()
 
 processor = virgulas("teste.csv")
-linhas = processor.verLinhas()
-colunas = processor.cabecalho()
-processor.escrever(colunas,linhas)
-processor.toc()
+processor.verLinhas()
+processor.cabecalho()
+styleCSS()
+processor.escreverincio()
 
-olaaaaaaaaaaaaaaaaaaaaa
-#print("categorais -> " ,colunas,linhas)
+
+processor.toc()
+processor.escreverfim()
+print("categorais -> " ,colunasCount,linhasCount)
