@@ -37,8 +37,7 @@ Chile,Santiago,Chilean Peso,Spanish
 China,Beijing,Chinese Yuan,Mandarin
 Colombia,Bogota,Colombian Peso,Spanish
 Comoros,Moron,Comorian Franc,"Comorian, Arabic, French"
-Democratic Republic
-Of the Congo,Kinshasa,Congolese Franc,French
+Democratic Republic Of the Congo,Kinshasa,Congolese Franc,French
 Republic of the Congo,Brazzaville,Central African CFA Franc,French
 Costa Rica,San Jose,Colon,Spanish
 Cote d'Ivoire (Ivory Coast),"Yamoussoukro, Abidjan",West African CFA Franc,French
@@ -146,4 +145,4 @@ Qatar,Doha,Qatari Riyal,Arabic
 Romania,Bucharest,Romanian Rupee,Romanian
 Romania,Bucharest,Romanian Rupee,Romanian
 Russia,Moscow,Ruble,Russian
-Rwanda,Kigali,Rwandan Franc,"Kinyarwanda, French, English"
+#Rwanda,Kigali,Rwandan Franc,"Kinyarwanda, French, English"

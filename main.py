@@ -10,26 +10,24 @@ class virgulas:
     tokens = ("COMMENT","QUOTATION","COMMA")
     t_ignore = ""
 
-    def t_COMMENT(self,t):
+    def t_COMMENT(self, t):
         r"\#[^\n]+"
-        pass
+        return t
 
-    def t_QUOTATION(self,t):
+    def t_QUOTATION(self, t):
         r"(,?)\"[^\"]+(\"?),?"
         escreverTabela(t.value)
         return t
 
-    def t_COMMA(self,t):
+    def t_COMMA(self, t):
         r"(,?)[^\,]+,?"
+        t.value = t.value.replace(",","")
         escreverTabela(t.value)
         return t
 
     def t_error(self, t):
         print(f"Unexpected tokens: {t.value[:10]}")
         exit(1)
-
-
-
 
     def __init__(self, filename):
         self.lexer = None
@@ -67,21 +65,25 @@ class virgulas:
         for x in contents.splitlines():
             self.lexer.input(x)
             for token in iter(self.lexer.token, None):
-                pass
-                #print(token)
+                #pass
+                print(token)
         print("Finished processing")
 
     def escreverincio(self):
         text = '''<html>
+        <link href="estilo.css" rel="stylesheet" media="all" />
     <body>
-        <table id = "customers">'''
-        file = open("tabela.html", "a")
+    <div class="container" border ="1">
+        <table>'''
+
+        file = open("tabela.html", "w")
         file.write(text)
         file.close()
 
     def escreverfim(self):
         text = '''
-        </table>
+        </table >
+        </div>
     </body>
 </html>    
                 '''
@@ -89,80 +91,18 @@ class virgulas:
         file.write(text)
         file.close()
 
-    def escrever(self,colunas,linhas):
-        text = '''<html>
-    <body>
-        <table id = "customers">
-
-            '''
-        file = open("tabela.html", "w")
-        file.write(text)
-        file.close()
-
-        file = open("tabela.html","a")
-
-        for i in range(linhas):
-            text = "<tr>"
-            file.write(text)
-
-            for a in range(colunas):
-                text = "<td>  Eu sou lindo  </td>"
-                file.write(text)
-
-        text = '''
-        </table>
-    </body>
-</html>    
-                '''
-        file.write(text)
-        file.close()
-
-def styleCSS():
-    text = '''
-    <style>
-#customers {
-  font-family: Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
-
-#customers td, #customers th {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-#customers tr:nth-child(even){background-color: #f2f2f2;}
-
-#customers tr:hover {background-color: #ddd;}
-
-#customers th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: #04AA6D;
-  color: white;
-}
-</style>'''
-
-    file = open("tabela.html", "w")
-    file.write(text)
-    file.close()
-
-
 def escreverTabela(palavra):
     file = open("tabela.html", "a")
     global posicaoLinha,linhasCount,posicaoColuna,colunasCount
-    print(posicaoColuna)
     if(posicaoLinha < linhasCount):
         text = '''<td>''' + palavra + '''</td>'''
         file.write(text)
-
         if (posicaoLinha == linhasCount - 1):
             posicaoLinha = 0
         posicaoLinha = posicaoLinha + 1
 
     if(posicaoColuna == colunasCount - 1):
-        text = '''</tr>'''
+        text = '''<tr class="active-row">'''
         file.write(text)
         posicaoColuna = -1
 
@@ -173,10 +113,7 @@ def escreverTabela(palavra):
 processor = virgulas("teste.csv")
 processor.verLinhas()
 processor.cabecalho()
-styleCSS()
 processor.escreverincio()
-
-
 processor.toc()
 processor.escreverfim()
 print("categorais -> " ,colunasCount,linhasCount)
