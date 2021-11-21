@@ -1,10 +1,10 @@
 import ply.lex as plex
 import csv
 
-linhasCount = 0
 colunasCount = 0
-posicaoLinha = 0
 posicaoColuna = 0
+posicaoColunaLatex = 0
+countLatex = 0
 
 class virgulas:
     tokens = ("COMMENT","QUOTATION","COMMA")
@@ -17,12 +17,14 @@ class virgulas:
     def t_QUOTATION(self, t):
         r"(,?)\"[^\"]+(\"?),?"
         escreverTabela(t.value)
+        escreverLatex(t.value)
         return t
 
     def t_COMMA(self, t):
         r"(,?)[^\,]+,?"
         t.value = t.value.replace(",","")
         escreverTabela(t.value)
+        escreverLatex(t.value)
         return t
 
     def t_error(self, t):
@@ -45,18 +47,6 @@ class virgulas:
         global colunasCount
         colunasCount = numero
 
-    def verLinhas(self):
-        i = 0
-        file = open("teste.csv", "r")
-        reader = csv.reader(file)
-        for line in reader:
-            i = i +1
-            if line[0][0] == "#":
-                i = i-1
-        global linhasCount
-        linhasCount = i
-
-
     def toc(self, **kwargs):
         self.lexer = plex.lex(module=self, **kwargs)
         with open(self.filename, "r") as fh:
@@ -65,8 +55,8 @@ class virgulas:
         for x in contents.splitlines():
             self.lexer.input(x)
             for token in iter(self.lexer.token, None):
-                #pass
-                print(token)
+                pass
+                #print(token)
         print("Finished processing")
 
     def escreverincio(self):
@@ -91,15 +81,30 @@ class virgulas:
         file.write(text)
         file.close()
 
+    def escreverInicioLatex(self):
+        text = '''\documentclass{article}
+\/begin{document}
+\/begin{center}
+\/begin{tabular} '''
+        text = text.replace("/", "")
+        file = open("latex.tex", "w")
+        file.write(text)
+        file.close()
+
+    def escreverFimLatex(self):
+        text = '''
+\end{tabular}
+\end{center}
+\end{document}'''
+        file = open("latex.tex", "a")
+        file.write(text)
+        file.close()
+
 def escreverTabela(palavra):
     file = open("tabela.html", "a")
-    global posicaoLinha,linhasCount,posicaoColuna,colunasCount
-    if(posicaoLinha < linhasCount):
-        text = '''<td>''' + palavra + '''</td>'''
-        file.write(text)
-        if (posicaoLinha == linhasCount - 1):
-            posicaoLinha = 0
-        posicaoLinha = posicaoLinha + 1
+    global posicaoColuna,colunasCount
+    text = '''<td>''' + palavra + '''</td>'''
+    file.write(text)
 
     if(posicaoColuna == colunasCount - 1):
         text = '''<tr class="active-row">'''
@@ -110,10 +115,48 @@ def escreverTabela(palavra):
 
     file.close()
 
+def escreverLatex(palavra):
+    file = open("latex.tex", "a")
+    global posicaoColunaLatex,colunasCount,countLatex
+    if "&" in palavra:
+        palavra = palavra.replace("&","\&")
+
+    text = palavra + ''' & '''
+    if countLatex == colunasCount-1:
+        text = text.replace("&","")
+        countLatex = -1
+
+    file.write(text)
+    if(posicaoColunaLatex == colunasCount - 1):
+        text = ''' \\\\ \hline \n'''
+        print("\n\n")
+        file.write(text)
+        posicaoColunaLatex = -1
+
+    posicaoColunaLatex = posicaoColunaLatex + 1
+    countLatex = countLatex + 1
+
+    file.close()
+
+def escreverColunasLatex():
+    file = open("latex.tex","a")
+    global linhasCount
+    ola = ""
+    for x in range(colunasCount):
+        ola = ola + "c "
+
+    text = '''{||  ''' + ola + ''' ||}
+    '''
+
+    file.write(text)
+    file.close()
+
 processor = virgulas("teste.csv")
-processor.verLinhas()
 processor.cabecalho()
 processor.escreverincio()
+processor.escreverInicioLatex()
+escreverColunasLatex()
 processor.toc()
+processor.escreverFimLatex()
 processor.escreverfim()
-print("categorais -> " ,colunasCount,linhasCount)
+print("categorais -> " ,colunasCount)
