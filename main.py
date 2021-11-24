@@ -214,22 +214,22 @@ def escreverAuxiliarLatex(lista):
     hehe = ""
 
     text = '''\documentclass{article}
-    \/begin{document}
-    \/begin{center}
-    \/begin{tabular} {|| c ||}'''
+\/begin{document}
+\/begin{center}
+\/begin{tabular} {|| c ||}
+'''
     text = text.replace("/", "")
     file.write(text)
 
     for x in lista:
-        ola = x + '''\\\\ \hline \n'''
+        ola = '''   '''+  x + '''\\\\ \hline \n'''
         hehe = hehe + ola
 
     file.write(hehe)
 
-    text = '''
-    \end{tabular}
-    \end{center}
-    \end{document}'''
+    text = '''\end{tabular}
+\end{center}
+\end{document}'''
     file.write(text)
     file.close()
 
