@@ -36,78 +36,89 @@ class virgulas:
         self.filename = filename
         self.inside_header = False
 
-    def cabecalho(self):
-        i = 0
-        file = open("teste.csv", "r")
-        reader = csv.reader(file)
-        for line in reader:
-            if i == 0:
-                numero = len(line)
-            i  = i +1
-        global colunasCount
-        colunasCount = numero
-
     def toc(self, **kwargs):
         self.lexer = plex.lex(module=self, **kwargs)
         with open(self.filename, "r") as fh:
             contents = fh.read()
 
         for x in contents.splitlines():
+            #x = x.replace("/n","")
             self.lexer.input(x)
             for token in iter(self.lexer.token, None):
                 pass
-                #print(token)
+                #print(token.value)
         print("Finished processing")
 
-    def escreverincio(self):
-        text = '''<html>
-        <link href="estilo.css" rel="stylesheet" media="all" />
+def cabecalho():
+    numero = 0
+    str = ""
+    i = 0
+    file = open("teste.csv", "r")
+    reader = csv.reader(file)
+    for line in reader:
+        if i == 0:
+            numero = len(line)
+            str = line
+        i+=1
+
+    if str[-1] == "":
+        numero = numero-1
+
+    global colunasCount
+    colunasCount = numero
+    print(numero)
+
+def escreverincio():
+    text = '''<html>
+    <link href="estilo.css" rel="stylesheet" media="all" />
     <body>
     <div class="container" border ="1">
         <table>'''
 
-        file = open("tabela.html", "w")
-        file.write(text)
-        file.close()
+    file = open("tabela.html", "w")
+    file.write(text)
+    file.close()
 
-    def escreverfim(self):
-        text = '''
+def escreverfim():
+    text = '''
         </table >
         </div>
     </body>
 </html>    
-                '''
-        file = open("tabela.html", "a")
-        file.write(text)
-        file.close()
+            '''
+    file = open("tabela.html", "a")
+    file.write(text)
+    file.close()
 
-    def escreverInicioLatex(self):
-        text = '''\documentclass{article}
+def escreverInicioLatex():
+    text = '''\documentclass{article}
 \/begin{document}
 \/begin{center}
-\/begin{tabular} '''
-        text = text.replace("/", "")
-        file = open("latex.tex", "w")
-        file.write(text)
-        file.close()
+\/begin{tabular}'''
+    text = text.replace("/", "")
+    file = open("latex.tex", "w")
+    file.write(text)
+    file.close()
 
-    def escreverFimLatex(self):
-        text = '''
+def escreverFimLatex():
+    text = '''
 \end{tabular}
 \end{center}
 \end{document}'''
-        file = open("latex.tex", "a")
-        file.write(text)
-        file.close()
+    file = open("latex.tex", "a")
+    file.write(text)
+    file.close()
 
 def escreverTabela(palavra):
     file = open("tabela.html", "a")
     global posicaoColuna,colunasCount
-    text = '''<td>''' + palavra + '''</td>'''
+    text = '''
+            <td>''' + palavra + '''</td>'''
     file.write(text)
 
     if(posicaoColuna == colunasCount - 1):
-        text = '''<tr class="active-row">'''
+        text = '''
+            <tr>'''
         file.write(text)
         posicaoColuna = -1
 
@@ -129,7 +140,6 @@ def escreverLatex(palavra):
     file.write(text)
     if(posicaoColunaLatex == colunasCount - 1):
         text = ''' \\\\ \hline \n'''
-        print("\n\n")
         file.write(text)
         posicaoColunaLatex = -1
 
@@ -145,18 +155,16 @@ def escreverColunasLatex():
     for x in range(colunasCount):
         ola = ola + "c "
 
-    text = '''{||  ''' + ola + ''' ||}
-    '''
+    text = '''{||  ''' + ola + ''' ||}\n'''
 
     file.write(text)
     file.close()
 
 processor = virgulas("teste.csv")
-processor.cabecalho()
-processor.escreverincio()
-processor.escreverInicioLatex()
+cabecalho()
+escreverincio()
+escreverInicioLatex()
 escreverColunasLatex()
 processor.toc()
-processor.escreverFimLatex()
-processor.escreverfim()
-print("categorais -> " ,colunasCount)
+escreverFimLatex()
+escreverfim()
