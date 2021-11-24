@@ -5,6 +5,7 @@ colunasCount = 0
 posicaoColuna = 0
 posicaoColunaLatex = 0
 countLatex = 0
+html = []
 
 class virgulas:
     tokens = ("COMMENT","QUOTATION","COMMA")
@@ -66,7 +67,7 @@ def cabecalho():
 
     global colunasCount
     colunasCount = numero
-    print(numero)
+
 
 def escreverincio():
     text = '''<html>
@@ -81,20 +82,20 @@ def escreverincio():
 
 def escreverfim():
     text = '''
-        </table >
-        </div>
-    </body>
-</html>    
-            '''
+            </table >
+            </div>
+        </body>
+    </html>    
+                '''
     file = open("tabela.html", "a")
     file.write(text)
     file.close()
 
 def escreverInicioLatex():
     text = '''\documentclass{article}
-\/begin{document}
-\/begin{center}
-\/begin{tabular}'''
+    \/begin{document}
+    \/begin{center}
+    \/begin{tabular}'''
     text = text.replace("/", "")
     file = open("latex.tex", "w")
     file.write(text)
@@ -102,23 +103,24 @@ def escreverInicioLatex():
 
 def escreverFimLatex():
     text = '''
-\end{tabular}
-\end{center}
-\end{document}'''
+    \end{tabular}
+    \end{center}
+    \end{document}'''
     file = open("latex.tex", "a")
     file.write(text)
     file.close()
 
 def escreverTabela(palavra):
     file = open("tabela.html", "a")
-    global posicaoColuna,colunasCount
+    global posicaoColuna,colunasCount,html
     text = '''
             <td>''' + palavra + '''</td>'''
     file.write(text)
+    html.append(palavra)
 
-    if(posicaoColuna == colunasCount - 1):
+    if (posicaoColuna == colunasCount - 1):
         text = '''
-            <tr>'''
+                <tr>'''
         file.write(text)
         posicaoColuna = -1
 
@@ -160,6 +162,78 @@ def escreverColunasLatex():
     file.write(text)
     file.close()
 
+def colunaPrint(html):
+    global colunasCount
+    op = input("Opcao -> ")
+    lista = []
+    i = 0
+    max = int(op) - 1
+    for j in html:
+        if i == max:
+            lista.append(j)
+            max = i + colunasCount
+        i+=1
+
+    return lista
+
+def escreverAuxiliarHTML(lista):
+    file = open("auxiliar.html","w")
+    ola = ""
+    hehe = ""
+
+    text = '''<html>
+        <link href="estilo.css" rel="stylesheet" media="all" />
+    <body>
+        <div class="container" border ="1">
+            <table>'''
+
+    file.write(text)
+    file.close()
+
+    file = open("auxiliar.html","a")
+
+    for x in lista:
+        ola = '''
+                <td>''' + x + '''</td>      <tr>'''
+        hehe = hehe + ola
+
+    file.write(hehe)
+    text = '''
+            </table >
+        </div>
+    </body>
+</html>    
+                '''
+    file.write(text)
+    file.close()
+
+def escreverAuxiliarLatex(lista):
+    global linhasCount
+    file = open("auxiliarLatex.tex","w")
+    ola = ""
+    hehe = ""
+
+    text = '''\documentclass{article}
+    \/begin{document}
+    \/begin{center}
+    \/begin{tabular} {|| c ||}'''
+    text = text.replace("/", "")
+    file.write(text)
+
+    for x in lista:
+        ola = x + '''\\\\ \hline \n'''
+        hehe = hehe + ola
+
+    file.write(hehe)
+
+    text = '''
+    \end{tabular}
+    \end{center}
+    \end{document}'''
+    file.write(text)
+    file.close()
+
+teste = []
 processor = virgulas("teste.csv")
 cabecalho()
 escreverincio()
@@ -168,3 +242,7 @@ escreverColunasLatex()
 processor.toc()
 escreverFimLatex()
 escreverfim()
+teste = colunaPrint(html)
+escreverAuxiliarHTML(teste)
+escreverAuxiliarLatex(teste)
+print("Done")
