@@ -6,6 +6,7 @@ posicaoColuna = 0
 posicaoColunaLatex = 0
 countLatex = 0
 html = []
+cab = ""
 
 class virgulas:
     tokens = ("COMMENT","QUOTATION","COMMA")
@@ -53,6 +54,7 @@ class virgulas:
 def cabecalho():
     numero = 0
     str = ""
+    aux = ""
     i = 0
     file = open("teste.csv", "r")
     reader = csv.reader(file)
@@ -64,9 +66,15 @@ def cabecalho():
 
     if str[-1] == "":
         numero = numero-1
+    i = 1
+    for a in str:
+        aux = aux + "(" + aux.join(i.__str__()) + ")" + " "
+        aux = aux +  a + " | "
+        i+=1
 
-    global colunasCount
+    global colunasCount,cab
     colunasCount = numero
+    cab = aux
 
 
 def escreverincio():
@@ -163,7 +171,9 @@ def escreverColunasLatex():
     file.close()
 
 def colunaPrint(html):
-    global colunasCount
+    global colunasCount,cab
+
+    print(cab)
     op = input("Opcao -> ")
     lista = []
     i = 0
